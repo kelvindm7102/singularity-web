@@ -38,6 +38,9 @@ importers:
       react-hook-form:
         specifier: ^7.87.0
         version: 7.87.0(react@19.2.8)
+      use-wake-lock:
+        specifier: ^1.1.0
+        version: 1.1.0(react@19.2.8)
       zod:
         specifier: ^4.6.2
         version: 4.6.2
@@ -2067,6 +2070,12 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+
+  use-wake-lock@1.1.0:
+    resolution: {integrity: sha512-lDti+5NmNbU04Z3ONtgJqPplfsjD26bsUwNhKsaEeYJfZ9hsbxgxHnUtYAF7PIrPYvzBiwTjoenveUvvIzc6Lg==}
+    engines: {node: '>=8', npm: '>=5'}
+    peerDependencies:
+      react: ^16.9.0
 
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
@@ -4276,6 +4285,10 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  use-wake-lock@1.1.0(react@19.2.8):
+    dependencies:
+      react: 19.2.8
 
   which-boxed-primitive@1.1.1:
     dependencies:

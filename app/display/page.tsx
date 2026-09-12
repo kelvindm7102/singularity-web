@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect } from 'react';
 import DisplayLayout from '@/components/display/DisplayLayout';
 import IdleScreen from '@/components/display/IdleScreen';
@@ -29,26 +28,25 @@ export default function DisplayPage() {
   }, [connectionStatus, lastError, showOsd]);
 
   // Show IdleScreen if no song is playing
-  // Show IdleScreen if no song is playing
-  const { status, songId, fetchPlayback, setPlaybackState } = usePlaybackStore();
+  const { status, songId } = usePlaybackStore();
   const showIdle = connectionStatus === 'connected' && (!songId || status === 'stopped');
 
-  // Fetch playback and queue initially when connected
+  // Fetch queue initially when connected
   const { roomId } = useRoomStore();
   const { fetchQueue } = useQueueStore();
+
+  useEffect(() => {
+    if (window.navigator.wakeLock) window.navigator.wakeLock.request("screen").catch(err=>console.log(`${err.name}, ${err.message}`))
+  }, []);
   
   useEffect(() => {
     if (connectionStatus === 'connected' && roomId) {
-      // Initial fetch to sync state
-      fetchPlayback(roomId);
+      // Initial fetch to sync queue state
       fetchQueue(roomId);
 
-      // Listen for WebSocket room events
+      // Listen for WebSocket queue events (playback events handled in Player -> useDisplayPlayback)
       const unsubscribe = wsService.subscribeToRoomEvents((event) => {
-        if (event.type === 'PLAYBACK_UPDATED') {
-          // Payload is PlaybackState
-          setPlaybackState(event.payload);
-        } else if (event.type === 'QUEUE_UPDATED') {
+        if (event.type === 'QUEUE_UPDATED') {
           if (Array.isArray(event.payload)) {
             useQueueStore.getState().setQueue(event.payload);
           } else {
@@ -59,7 +57,7 @@ export default function DisplayPage() {
 
       return () => unsubscribe();
     }
-  }, [connectionStatus, roomId, fetchPlayback, fetchQueue, setPlaybackState]);
+  }, [connectionStatus, roomId, fetchQueue]);
 
   return (
     <DisplayLayout>

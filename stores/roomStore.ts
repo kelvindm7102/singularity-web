@@ -65,8 +65,13 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
 
   // Used exclusively by the Display client to claim exclusive display ownership and send heartbeats
   initializeRoom: async () => {
-    let { roomId, displaySessionId, stopHeartbeat } = get();
-    stopHeartbeat();
+    let { roomId, displaySessionId } = get();
+    try{
+      get().stopHeartbeat();
+    } catch (err) {
+      console.log(err);
+    }
+
     set({ connectionStatus: 'connecting', lastError: null });
 
     if (!displaySessionId || displaySessionId === 'server-session') {
@@ -117,14 +122,15 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       heartbeatInterval = setInterval(async () => {
         try {
           await roomsApi.heartbeat(activeRoomId!, displaySessionId!);
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error('Display heartbeat failed:', err);
         }
       }, 5000);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to initialize display room:', err);
-      set({ connectionStatus: 'error', lastError: err.message || 'Failed to connect' });
+      const errorMsg = err instanceof Error ? err.message : 'Failed to connect';
+      set({ connectionStatus: 'error', lastError: errorMsg });
     }
   },
 

@@ -34,8 +34,6 @@ interface PlaybackStoreState {
   requestSeek: (timeSec: number) => void;
   consumeSeek: () => void;
   setPlaybackState: (state: Partial<PlaybackState>) => void;
-  fetchPlayback: (roomId: string) => Promise<void>;
-  updatePlayback: (roomId: string, state: PlaybackState) => Promise<void>;
   fetchLyrics: (songId: string) => Promise<void>;
   setActiveLyric: (lyricId: string) => Promise<void>;
 }
@@ -51,7 +49,7 @@ const getInitialVolumes = () => {
         vocalVolume: typeof parsed.vocal === 'number' ? parsed.vocal : 0
       };
     }
-  } catch (e) {}
+  } catch (ignore) {}
   return { instrumentVolume: 0.8, vocalVolume: 0 };
 };
 
@@ -150,46 +148,4 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
     } catch (e) {
       console.error('Failed to load lyric content', e);
     }
-  },
-  
-  fetchPlayback: async (roomId: string) => {
-    try {
-      const state = await roomsApi.getPlayback(roomId);
-      if (state) {
-        get().setPlaybackState(state);
-      }
-    } catch (err) {
-      console.error('Failed to fetch playback', err);
-    }
-  },
-
-  updatePlayback: async (roomId: string, state: PlaybackState) => {
-    try {
-      const prevSongId = get().songId;
-      await roomsApi.updatePlayback(roomId, state);
-      set({
-        songId: state.songId,
-        status: state.status,
-        mode: state.mode,
-        positionMs: state.positionMs,
-        changedAt: state.changedAt
-      });
-      if (state.songId && (!get().currentSong || get().currentSong?.id !== state.songId)) {
-        try {
-          const song = await libraryApi.getById(state.songId);
-          set({ currentSong: song });
-        } catch (e) {
-          console.error('Failed to load song info', e);
-        }
-        // Auto-fetch lyrics for new song
-        if (prevSongId !== state.songId) {
-          get().fetchLyrics(state.songId);
-        }
-      } else if (!state.songId || state.status === 'stopped') {
-        set({ currentSong: null, currentTime: 0, duration: 0, availableLyrics: [], activeLyricId: null, activeLyricData: null });
-      }
-    } catch (err) {
-      console.error('Failed to update playback state', err);
-    }
-  }
-}));
+}}));

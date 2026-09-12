@@ -21,7 +21,8 @@
 
   --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
-  --font-display: var(--font-geist-sans), Arial, Helvetica, sans-serif; /* will update later if custom font used */
+  --font-display: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  /* will update later if custom font used */
 
   --shadow-glow-subtle: 0 0 12px rgba(24, 216, 255, 0.18);
   --shadow-glow-active: 0 0 20px rgba(24, 216, 255, 0.4);
@@ -39,11 +40,12 @@ body {
   min-height: 100vh;
   /* subtle starfield / atmosphere background can be added here or via layered divs */
   background-image: radial-gradient(circle at top right, rgba(24, 216, 255, 0.03), transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(25, 118, 255, 0.03), transparent 40%);
+    radial-gradient(circle at bottom left, rgba(25, 118, 255, 0.03), transparent 40%);
 }
 
 @layer utilities {
   .bg-surface {
-    background-color: rgba(8, 14, 28, 0.90); /* space-900 with 90% opacity */
+    background-color: rgba(8, 14, 28, 0.90);
+    /* space-900 with 90% opacity */
   }
 }

@@ -21,13 +21,11 @@ export default function ControlBar() {
   const { 
     status, 
     mode, 
-    updatePlayback, 
     songId, 
     currentSong, 
     currentTime, 
     duration, 
     requestSeek,
-    fetchPlayback,
     instrumentVolume,
     vocalVolume,
     setInstrumentVolume,
@@ -54,12 +52,8 @@ export default function ControlBar() {
         setIsVolumeOpen(false);
       }
     };
-    if (isVolumeOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    if (isVolumeOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isVolumeOpen]);
 
   // Close lyric dropdown when clicking outside
@@ -69,44 +63,43 @@ export default function ControlBar() {
         setIsLyricOpen(false);
       }
     };
-    if (isLyricOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    if (isLyricOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isLyricOpen]);
 
   if (!controlsVisible) return null;
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!roomId || !songId) return;
-    updatePlayback(roomId, {
+    const newState = {
       songId,
       status: status === 'playing' ? 'paused' : 'playing',
       mode,
       positionMs: Math.round(currentTime * 1000),
       changedAt: new Date().toISOString()
-    });
+    } as any;
+    await roomsApi.updatePlayback(roomId, newState);
+    usePlaybackStore.getState().setPlaybackState(newState);
   };
 
   const toggleMode = () => {
     if (!roomId) return;
-    updatePlayback(roomId, {
+    const newState = {
       songId,
       status,
       mode: mode === 'karaoke' ? 'original' : 'karaoke',
       positionMs: Math.round(currentTime * 1000),
       changedAt: new Date().toISOString()
-    });
+    } as any;
+    roomsApi.updatePlayback(roomId, newState);
+    usePlaybackStore.getState().setPlaybackState(newState);
   };
 
   const handleSkip = async () => {
     if (!roomId) return;
     try {
       await roomsApi.reportPlaybackEnded(roomId);
-      await fetchPlayback(roomId);
-      await fetchQueue(roomId);
+      // Let websocket sync handle the rest
     } catch (e) {
       console.error('Failed to skip track', e);
     }
@@ -192,7 +185,7 @@ export default function ControlBar() {
                 {currentSong?.title || "Singularity"}
               </div>
               <div className="text-sm font-medium text-cyan-100/60 uppercase tracking-widest truncate max-w-[200px]">
-                {currentSong?.artist || "Idling..."}
+                {currentSong?.artist || "No track loaded"}
               </div>
             </div>
           </div>

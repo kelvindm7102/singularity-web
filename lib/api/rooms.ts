@@ -1,5 +1,5 @@
-import { fetchApi } from './client';
-import { RoomState, CreateRoomResponse, PlaybackState } from '@/types/room';
+import {fetchApi} from './client';
+import {CreateRoomResponse, PlaybackState, RoomState} from '@/types/room';
 
 export const roomsApi = {
   create: () =>
@@ -14,11 +14,14 @@ export const roomsApi = {
       body: JSON.stringify({ sessionId })
     }),
 
-  heartbeat: (roomId: string, sessionId: string) =>
+  heartbeat: (roomId: string, sessionId: string) => {
+    if (!roomId) console.log("KONTOL ROOM NA EWEUHAN")
+    if (!sessionId) console.log("SESSION NA ROOM NA EWEUHAN")
     fetchApi<void>(`/api/rooms/${roomId}/heartbeat`, {
       method: 'POST',
       body: JSON.stringify({ sessionId })
-    }),
+    })
+  },
 
   releaseDisplay: (roomId: string) =>
     fetchApi<void>(`/api/rooms/${roomId}/display`, {
@@ -27,7 +30,7 @@ export const roomsApi = {
 
   // Playback
   getPlayback: (roomId: string) =>
-    fetchApi<any>(`/api/rooms/${roomId}/playback`),
+    fetchApi<PlaybackState>(`/api/rooms/${roomId}/playback`),
     
   updatePlayback: (roomId: string, state: PlaybackState) =>
     fetchApi<void>(`/api/rooms/${roomId}/playback`, {

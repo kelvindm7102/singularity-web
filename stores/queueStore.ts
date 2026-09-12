@@ -8,6 +8,7 @@ export interface QueueItem {
   artist?: string;
   position: number;
   addedAt: string;
+  hasCover: boolean;
 }
 
 interface QueueStoreState {

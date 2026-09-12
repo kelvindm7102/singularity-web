@@ -4,7 +4,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { useQueueStore } from '@/stores/queueStore';
 import { useRoomStore } from '@/stores/roomStore';
 import { usePlaybackStore } from '@/stores/playbackStore';
-import { ListMusic, Search, ChevronRight, Plus, X, Trash2, Volume2, Mic2, Music2, Play } from 'lucide-react';
+import { Search, ChevronRight, Plus, X, Trash2, Volume2, Mic2, Music2, Play } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { libraryApi, Song } from '@/lib/api/library';
 import { getCoverUrl } from '@/lib/api/client';
@@ -18,7 +18,6 @@ export default function Sidebar() {
     status, 
     mode, 
     songId, 
-    fetchPlayback, 
     instrumentVolume, 
     vocalVolume, 
     setInstrumentVolume, 
@@ -63,7 +62,6 @@ export default function Sidebar() {
         artist: song.artist
       });
       await fetchQueue(roomId);
-      await fetchPlayback(roomId);
       setSearchQuery(''); // clear search after adding
     } catch (e) {
       console.error(e);
@@ -100,7 +98,6 @@ export default function Sidebar() {
       }
 
       await roomsApi.playQueueItem(roomId, item.queueItemId);
-      await fetchPlayback(roomId);
       await fetchQueue(roomId);
     } catch (e) {
       console.error('Failed to play queue item', e);

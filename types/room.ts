@@ -11,6 +11,8 @@ export interface PlaybackState {
   status: PlaybackStatus;
   mode: PlaybackMode;
   positionMs: number;
+  instrumentVolume: number;
+  vocalVolume: number;
   changedAt: string;
 }
 

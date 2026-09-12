@@ -61,6 +61,15 @@ class WebSocketService {
       this.messageHandlers.delete(handler);
     };
   }
+
+  public publish(destination: string, body: any) {
+    if (this.client && this.client.connected) {
+      this.client.publish({
+        destination,
+        body: JSON.stringify(body)
+      });
+    }
+  }
 }
 
 export const wsService = new WebSocketService();

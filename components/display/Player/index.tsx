@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePlaybackStore } from '@/stores/playbackStore';
+import { useDisplayPlayback } from '@/hooks/useDisplayPlayback';
 import { PlaybackRuntime } from '@/runtime/playback/PlaybackRuntime';
 import { useRoomStore } from '@/stores/roomStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -12,8 +13,9 @@ export default function Player() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const runtimeRef = useRef<PlaybackRuntime | null>(null);
   
-  const { songId, status, mode, instrumentVolume, vocalVolume, updatePlayback, currentSong } = usePlaybackStore();
-  const roomId = useRoomStore(state => state.roomId);
+  const { songId, status, mode, instrumentVolume, vocalVolume, currentSong, positionMs, changedAt } = usePlaybackStore();
+  const roomId = useRoomStore(state => state.roomId) || undefined;
+  const { updateDisplayPlayback, reportSongEnded } = useDisplayPlayback(roomId);
 
   // Initialize Runtime
   useEffect(() => {
@@ -27,15 +29,7 @@ export default function Player() {
       runtimeRef.current.onEnded = async () => {
         usePlaybackStore.getState().setProgress(0, 0);
         if (roomId) {
-          try {
-            const { roomsApi } = await import('@/lib/api/rooms');
-            await roomsApi.reportPlaybackEnded(roomId);
-            const { useQueueStore } = await import('@/stores/queueStore');
-            await usePlaybackStore.getState().fetchPlayback(roomId);
-            await useQueueStore.getState().fetchQueue(roomId);
-          } catch (e) {
-            console.error(e);
-          }
+          await reportSongEnded();
         }
       };
 
@@ -67,25 +61,37 @@ export default function Player() {
     }
   }, [roomId]);
 
-  // Handle Seek Target
+  // Handle Seek Target (from display local interactions)
   const seekTarget = usePlaybackStore(state => state.seekTarget);
   useEffect(() => {
     if (seekTarget !== null && runtimeRef.current) {
-      const positionMs = Math.round(seekTarget * 1000);
-      runtimeRef.current.seek(positionMs);
+      const posMs = Math.round(seekTarget * 1000);
+      runtimeRef.current.seek(posMs);
       if (roomId) {
         const state = usePlaybackStore.getState();
-        updatePlayback(roomId, {
+        updateDisplayPlayback({
           songId: state.songId,
           status: state.status,
           mode: state.mode,
-          positionMs,
+          positionMs: posMs,
           changedAt: new Date().toISOString()
         });
       }
       usePlaybackStore.getState().consumeSeek();
     }
-  }, [seekTarget, roomId, updatePlayback]);
+  }, [seekTarget, roomId, updateDisplayPlayback]);
+
+  // Handle remote position synchronization
+  useEffect(() => {
+    const runtime = runtimeRef.current;
+    if (!runtime || !songId || !audioRef.current) return;
+
+    const currentAudioTimeMs = audioRef.current.currentTime * 1000;
+    // If the remote state is updated and differs from local time by > 1.5 seconds, we sync
+    if (Math.abs(currentAudioTimeMs - positionMs) > 1500) {
+      runtime.seek(positionMs);
+    }
+  }, [positionMs, changedAt, songId]);
 
   const lastLoadedSongIdRef = useRef<string | null>(null);
 

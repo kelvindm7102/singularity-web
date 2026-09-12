@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRoomStore } from '@/stores/roomStore';
-import { libraryApi, Song } from '@/lib/api/library';
-import { roomsApi } from '@/lib/api/rooms';
-import { getCoverUrl } from '@/lib/api/client';
-import { Search, Plus, Check, Loader2 } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {useRoomStore} from '@/stores/roomStore';
+import {libraryApi, Song} from '@/lib/api/library';
+import {roomsApi} from '@/lib/api/rooms';
+import {getCoverUrl} from '@/lib/api/client';
+import {Check, Loader2, Plus, Search} from 'lucide-react';
 
 export default function ControlLibraryPage() {
   const { roomId } = useRoomStore();
@@ -32,20 +32,20 @@ export default function ControlLibraryPage() {
   };
 
   useEffect(() => {
-    fetchSongs();
+    fetchSongs().then();
   }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setQuery(val);
     if (!val.trim()) {
-      fetchSongs('');
+      fetchSongs('').then();
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.SubmitEvent) => {
     e.preventDefault();
-    fetchSongs(query);
+    fetchSongs(query).then();
   };
 
   const handleAddToQueue = async (song: Song) => {
@@ -66,18 +66,18 @@ export default function ControlLibraryPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#050914] text-[#F2F7FF]">
+    <div className="flex flex-col h-full bg-space-950 text-text-primary">
       {/* Sticky Header with Search */}
-      <div className="sticky top-0 z-20 bg-[#050914]/90 backdrop-blur-md p-4 md:p-6 border-b border-[#18D8FF]/20">
+      <div className="sticky top-0 z-20 bg-space-950/90 backdrop-blur-md p-4 md:p-6 border-b border-cyan-500/20">
         <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
           <input
             type="text"
             value={query}
             onChange={handleSearchChange}
             placeholder="Search songs, artists..."
-            className="w-full bg-[#82aadc11] border border-[#82aadc33] rounded-xl py-3 pl-12 pr-4 text-[#F2F7FF] placeholder-[#A9B7CC] focus:outline-none focus:border-[#18D8FF]/50 focus:shadow-[0_0_15px_rgba(24,216,255,0.1)] transition-all font-body text-lg"
+            className="w-full bg-[#82aadc11] border border-[#82aadc33] rounded-xl py-3 pl-12 pr-4  placeholder-text-secondary focus:outline-none focus:shadow-[0_0_15px_rgba(24,216,255,0.1)] transition-all font-body text-lg"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A9B7CC] w-5 h-5" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary w-5 h-5" />
           <button type="submit" className="hidden" />
         </form>
       </div>
@@ -87,10 +87,10 @@ export default function ControlLibraryPage() {
         <div className="max-w-2xl mx-auto space-y-2 pb-24 md:pb-8">
           {loading ? (
             <div className="flex justify-center p-12">
-              <Loader2 className="w-8 h-8 animate-spin text-[#18D8FF]" />
+              <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
             </div>
           ) : songs.length === 0 ? (
-            <div className="text-center p-12 text-[#A9B7CC] font-body">
+            <div className="text-center p-12 text-text-secondary font-body">
               No songs found.
             </div>
           ) : (
@@ -103,7 +103,7 @@ export default function ControlLibraryPage() {
                 <div className="w-14 h-14 bg-black/40 rounded-lg overflow-hidden shrink-0 border border-[#82aadc33]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={getCoverUrl(song.id, song.hasCover)} 
+                    src={getCoverUrl(song.id, song.hasCover || false)}
                     alt={song.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
@@ -112,10 +112,10 @@ export default function ControlLibraryPage() {
                 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-display tracking-wide truncate text-[#F2F7FF]">
+                  <h3 className="text-base font-display tracking-wide truncate text-text-primary">
                     {song.title}
                   </h3>
-                  <p className="text-sm font-body text-[#A9B7CC] truncate">
+                  <p className="text-sm font-body text-text-secondary truncate">
                     {song.artist}
                   </p>
                 </div>
@@ -123,10 +123,10 @@ export default function ControlLibraryPage() {
                 {/* Add Button */}
                 <button
                   onClick={() => handleAddToQueue(song)}
-                  className={`shrink-0 p-3 rounded-full transition-all opacity-90 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${
+                  className={`shrink-0 p-3 rounded-full transition-all opacity-90 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 ${
                     addedIds[song.id] 
                       ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 md:opacity-100' 
-                      : 'text-[#18D8FF] bg-[#18D8FF]/10 hover:bg-[#18D8FF]/20'
+                      : 'text-cyan-500 bg-cyan-500/10 hover:bg-cyan-500/20'
                   }`}
                   aria-label="Add to Queue"
                 >
