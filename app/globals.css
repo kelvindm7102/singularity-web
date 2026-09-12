@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-space-950: #050914;
+  --color-space-900: #080E1C;
+  --color-space-850: #0B1324;
+
+  --color-blue-700: #1557C0;
+  --color-blue-600: #1976FF;
+  --color-blue-500: #2494FF;
+
+  --color-cyan-500: #18D8FF;
+  --color-cyan-400: #43E7FF;
+
+  --color-text-primary: #F2F7FF;
+  --color-text-secondary: #A9B7CC;
+  --color-text-muted: #64748B;
+
+  --color-border-subtle: rgba(130, 170, 220, 0.20);
+  --color-border-strong: rgba(80, 170, 255, 0.40);
+
+  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+  --font-display: var(--font-geist-sans), Arial, Helvetica, sans-serif; /* will update later if custom font used */
+
+  --shadow-glow-subtle: 0 0 12px rgba(24, 216, 255, 0.18);
+  --shadow-glow-active: 0 0 20px rgba(24, 216, 255, 0.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  background-color: var(--color-space-950);
+  color: var(--color-text-primary);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  margin: 0;
+  min-height: 100vh;
+  /* subtle starfield / atmosphere background can be added here or via layered divs */
+  background-image: radial-gradient(circle at top right, rgba(24, 216, 255, 0.03), transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(25, 118, 255, 0.03), transparent 40%);
+}
+
+@layer utilities {
+  .bg-surface {
+    background-color: rgba(8, 14, 28, 0.90); /* space-900 with 90% opacity */
+  }
 }
