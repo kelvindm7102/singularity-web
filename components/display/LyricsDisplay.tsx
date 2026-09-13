@@ -52,15 +52,9 @@ export default function LyricsDisplay() {
   const transPartsFlat = useRef<(HTMLElement | null)[]>([]);
   const rafIdRef = useRef<number | null>(null);
 
-  const lines: LyricLine[] =
-    activeLyricData?.lyrics && activeLyricData.lyrics.length > 0
-      ? (activeLyricData.lyrics as LyricLine[])
-      : [];
+  const lines: LyricLine[] = activeLyricData?.lyrics && activeLyricData.lyrics.length > 0 ? (activeLyricData.lyrics as LyricLine[]) : [];
 
-  const rawText: string | null =
-    lines.length === 0 && activeLyricData?.content
-      ? activeLyricData.content
-      : null;
+  const rawText: string | null = lines.length === 0 && activeLyricData?.content ? activeLyricData.content : null;
 
   // ── Init runtime once ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -144,15 +138,7 @@ export default function LyricsDisplay() {
   if (!activeLyricData || (!lines.length && !rawText)) return null;
 
   // Raw-text fallback (non-timed format)
-  if (rawText) {
-    return (
-      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-        <pre className="text-white/60 text-lg font-sans whitespace-pre-wrap text-center leading-loose max-w-2xl mx-12">
-          {rawText}
-        </pre>
-      </div>
-    );
-  }
+  if (rawText) return (<div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"><pre className="text-white/60 text-lg font-sans whitespace-pre-wrap text-center leading-loose max-w-2xl mx-12">{rawText}</pre></div>);
 
   return (
     <>
@@ -195,63 +181,38 @@ export default function LyricsDisplay() {
             const isInstrumental = line.isInstrumental;
 
             return (
-              <div
-                key={i}
-                ref={el => { lineRootRefs.current[i] = el; }}
-                className="lyric-line text-center select-none will-change-transform"
-                style={{ opacity: 0.90, transform: 'scale(1.0)' }}
-              >
+              <div key={i} ref={el => { lineRootRefs.current[i] = el; }} className="lyric-line text-center select-none will-change-transform" style={{ opacity: 0.90, transform: 'scale(1.0)' }}>
                 {isInstrumental ? (
-                  <span
-                    ref={el => { origElRefs.current[i] = el; }}
-                    className="text-2xl text-white/40"
-                  >
+                  <span ref={el => { origElRefs.current[i] = el; }} className="text-2xl text-white/40">
                     ♪
                   </span>
                 ) : (
                   <>
                     {/* ── Original lyric track ─── §13 */}
-                    <div
-                      ref={el => { origElRefs.current[i] = el; }}
-                      className="text-5xl font-bold text-white leading-snug tracking-wide"
-                    >
+                    <div ref={el => { origElRefs.current[i] = el; }} className="text-5xl font-bold leading-snug tracking-wide">
                       {line.parts && line.parts.length > 0 ? (
                         line.parts.map((p, pi) => (
-                          <span
-                            key={pi}
-                            ref={el => { partElsFlat.current[i * 1000 + pi] = el; }}
-                            className={`lyric-part${p.isBackground ? ' lyric-bg-part' : ''}`}
-                            data-w={nbsify(p.words)}
-                            style={{ color: 'rgba(255,255,255,0.3)' }}
+                          <span key={pi} ref={el => { partElsFlat.current[i * 1000 + pi] = el; }} className={`lyric-part${p.isBackground ? ' lyric-bg-part' : ''}`} data-w={nbsify(p.words)} style={{ color: 'rgba(255,255,255,0.3)' }}
                           >
                             {nbsify(p.words)}
                           </span>
                         ))
                       ) : (
-                        <span>{nbsify(line.words)}</span>
+                        <div className={''}>{nbsify(line.words)}</div>
                       )}
                     </div>
 
                     {/* ── Romanization track ─── §14 */}
                     {hasRoma && (
-                      <div
-                        ref={el => { romaElRefs.current[i] = el; }}
-                        className="text-2xl font-semibold text-white/60 mt-1 leading-snug"
-                      >
+                      <div ref={el => { romaElRefs.current[i] = el; }} className="text-2xl font-semibold text-white/60 mt-1 leading-snug">
                         {line.timedRomanization && line.timedRomanization.length > 0 ? (
                           line.timedRomanization.map((p, pi) => (
-                            <span
-                              key={pi}
-                              ref={el => { romaPartsFlat.current[i * 1000 + pi] = el; }}
-                              className="lyric-part"
-                              data-w={nbsify(p.words)}
-                              style={{ color: 'rgba(255,255,255,0.25)' }}
-                            >
+                            <span key={pi} ref={el => { romaPartsFlat.current[i * 1000 + pi] = el; }} className="lyric-part" data-w={nbsify(p.words)} style={{ color: 'rgba(255,255,255,0.25)' }}>
                               {nbsify(p.words)}
                             </span>
                           ))
                         ) : (
-                          <span>{nbsify(line.romanization)}</span>
+                          <div className={''}>{nbsify(line.romanization)}</div>
                         )}
                       </div>
                     )}
@@ -264,19 +225,12 @@ export default function LyricsDisplay() {
                       >
                         {line.timedTranslation && line.timedTranslation.length > 0 ? (
                           line.timedTranslation.map((p, pi) => (
-                            <span
-                              key={pi}
-                              ref={el => { transPartsFlat.current[i * 1000 + pi] = el; }}
-                              className="lyric-part"
-                              data-w={nbsify(p.words)}
-                              style={{ color: 'rgba(255,255,255,0.2)' }}
+                            <span key={pi} ref={el => { transPartsFlat.current[i * 1000 + pi] = el; }} className="lyric-part" data-w={nbsify(p.words)} style={{ color: 'rgba(255,255,255,0.2)' }}
                             >
                               {nbsify(p.words)}
                             </span>
                           ))
-                        ) : (
-                          <span>{nbsify(line.translation)}</span>
-                        )}
+                        ) : (<div className={''}>{nbsify(line.translation)}</div>)}
                       </div>
                     )}
                   </>

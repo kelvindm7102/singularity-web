@@ -120,13 +120,21 @@ export class LyricRuntime {
 
       if (isActive) {
         opacity = 1;
-        scale = 1.07;
-        glowAlpha = 0.5;
+        scale = 1;
+        glowAlpha = 1;
       } else {
         // Flat uniform opacity for all inactive lines — every line equally readable
         opacity = 0.80;
-        scale = 1.0;
+        scale = 0.8;
         glowAlpha = 0;
+      }
+      if (isActive) {
+        ref.root.classList.add('[&>div]:text-white');
+        ref.root.classList.remove('[&>div]:text-white/40');
+
+      } else {
+        ref.root.classList.remove('[&>div]:text-white')
+        ref.root.classList.add('[&>div]:text-white/40')
       }
 
       ref.root.style.transition = `opacity ${TRANSITION_MS}ms ease, transform ${TRANSITION_MS}ms ease`;
